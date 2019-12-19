@@ -18,12 +18,22 @@ std::vector<uint8_t> getNALUnit(int i) {
         return empty;
     }
     fseek(f, 0, SEEK_END);
-    size_t fsize = ftell(f);
+    size_t fSize = ftell(f);
     fseek(f, 0, SEEK_SET);
     uint8_t* pictureBuffer;
-    posix_memalign((void**)&pictureBuffer, 32, fsize);
-    fread(pictureBuffer, fsize, 1, f);
-    std::vector<uint8_t> my_vector(&pictureBuffer[0], &pictureBuffer[fsize]);
+    int result=posix_memalign((void**)&pictureBuffer, 32, fSize);
+    if (result) {
+      std::cout << "Failed reserving memory" << std::endl;
+      std::vector<uint8_t> empty;
+      return empty;
+    }
+    size_t fResult = fread(pictureBuffer, 1, fSize, f);
+    if (fResult != fSize) {
+      std::cout << "Failed reading data" << std::endl;
+      std::vector<uint8_t> empty;
+      return empty;
+    }
+    std::vector<uint8_t> my_vector(&pictureBuffer[0], &pictureBuffer[fSize]);
     free(pictureBuffer);
     fclose(f);
     return my_vector;
@@ -77,7 +87,7 @@ int main() {
     for (int i = 0; i < WORKER_VIDEO_FRAMES ; ++i) {
         std::vector<uint8_t> thisNalData = getNALUnit(i+1);
         std::cout << "SendNAL > " << thisNalData.size() << " pts " << pts << std::endl;
-        myEFPSender.packAndSend(thisNalData,ElasticFrameContent::h264,pts,'ANXB',1,NO_FLAGS);
+        myEFPSender.packAndSend(thisNalData,ElasticFrameContent::h264,pts, EFP_CODE('A', 'N', 'X', 'B'),1,NO_FLAGS);
         //you could also send other data from other threads for example audio when the audio encoder spits out something.
         //myEFPSender.packAndSend(thisADTSData,ElasticFrameContent::adts,pts,'ADTS',1,NO_FLAGS);
         pts += 90000/60; //fake a pts of 60Hz. FYI.. the codestream is 23.98 (I and P only)
