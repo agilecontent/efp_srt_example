@@ -28,11 +28,35 @@ The libraries and header files needed ->
 ```	
 
 
+**MacOS:**
 
-## Usage
+```
+./modeMacOS.sh
+cmake .
+make
+mkdir tmp
+mv cppSRTFramingClient tmp/
+```
 
-1. Open a terminal window and run `./cppSRTFramingServer`
-2. Open two or more other terminal windows and run `./cppSRTFramingServer`
+**Linux:**
+
+```
+./modeLinux.sh
+cmake .
+make
+mkdir tmp
+mv cppSRTFramingClient tmp/
+```
+
+**Run the system:**
+
+```
+1. Start the server 
+./cppSRTFramingServer
+2. then from the other terminals.
+cd tmp
+./cppSRTFramingClient
+```
 
 Expected result->
 
