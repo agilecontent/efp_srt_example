@@ -31,6 +31,8 @@
 #include <condition_variable>
 #include <chrono>
 
+#define EFP_CODE(c0, c1, c2, c3) (((c0)<<24) | ((c1)<<16) | ((c2)<<8) | (c3))
+
 ///Enable or disable the APIs used by the unit tests
 #define UNIT_TESTS
 
@@ -179,9 +181,10 @@ public:
         SuperFrame &operator=(const SuperFrame &) = delete;
 
         SuperFrame(size_t memAllocSize) {
-            posix_memalign((void **) &pFrameData, 32,
+            int result = posix_memalign((void **) &pFrameData, 32,
                            memAllocSize);   //32 byte memory alignment for AVX2 processing //Winboze needs some other code.
-            if (pFrameData) mFrameSize = memAllocSize;
+
+            if (pFrameData && !result) mFrameSize = memAllocSize;
         }
         virtual ~SuperFrame() {
             //Free if allocated
