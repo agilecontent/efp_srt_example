@@ -5,7 +5,8 @@
 #define MTU 1456 //SRT-max
 
 SRTNet mySRTNetServer; //SRT
-ElasticFrameProtocol myEFPReceiver; //EFP
+
+void gotData(ElasticFrameProtocol::pFramePtr &rPacket);
 
 //**********************************
 //Server part
@@ -19,13 +20,15 @@ class MyClass {
 public:
   virtual ~MyClass() {
     *efpActiveElement = false; //Release active marker
+    myEFPReceiver.stopReceiver();
   };
   uint8_t efpId = 0;
   std::atomic_bool *efpActiveElement;
+  ElasticFrameProtocol myEFPReceiver;
 };
 
-// Array of 256 possible EFP receiver id's (true == active) each id can receive 256 EFP streams,
-// Could be millions but in EFP we today implemented 256.
+// Array of 256 possible EFP receivers, could be millions but I just decided 256 change to your needs. 
+// You could make it much simpler just giving a new connection a uint64_t number++  
 std::atomic_bool efpActiveList[UINT8_MAX] = {false};
 uint8_t getEFPId() {
   for (int i = 1; i < UINT8_MAX - 1; i++) {
@@ -58,6 +61,8 @@ std::shared_ptr<NetworkConnection> validateConnection(struct sockaddr_in *sin) {
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(a1->object); //Then get a pointer to my stuff
   v->efpId = efpId; // Populate it with the efpId
   v->efpActiveElement = &efpActiveList[efpId]; // And a pointer to the list so that we invalidate the id when SRT drops the connection
+  v->myEFPReceiver.receiveCallback = std::bind(&gotData, std::placeholders::_1); //In this example we aggregate all callbacks..
+  v->myEFPReceiver.startReceiver(10, 2);
   return a1; // Now hand over the ownership to SRTNet
 }
 
@@ -68,7 +73,7 @@ bool handleData(std::unique_ptr<std::vector<uint8_t>> &content,
                 SRTSOCKET clientHandle) {
   //We got data from SRTNet
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(ctx->object); //Get my object I gave SRTNet
-  myEFPReceiver.receiveFragment(*content, v->efpId); //unpack the fragment I got using the efpId created at connection time.
+  v->myEFPReceiver.receiveFragment(*content, v->efpId); //unpack the fragment I got using the efpId created at connection time.
   return true;
 }
 
@@ -84,11 +89,6 @@ void gotData(ElasticFrameProtocol::pFramePtr &rPacket) {
 }
 
 int main() {
-
-  myEFPReceiver.receiveCallback =
-      std::bind(&gotData, std::placeholders::_1); //In this example we aggregate all callbacks..
-  //However you could create a decoder/reciever/consumer in the MyClass and consume the data there.
-  myEFPReceiver.startReceiver(10, 2);
 
   //Setup and start the SRT server
   mySRTNetServer.clientConnected = std::bind(&validateConnection, std::placeholders::_1);
@@ -109,7 +109,6 @@ int main() {
 
   //When you decide to quit garbage collect and stop threads....
   mySRTNetServer.stop();
-  myEFPReceiver.stopReceiver();
 
   std::cout << "Done serving. Will exit." << std::endl;
   return 0;
