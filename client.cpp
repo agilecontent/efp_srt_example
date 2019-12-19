@@ -2,18 +2,15 @@
 #include "efp/ElasticFrameProtocol.h"
 #include "srt/SRTNet.h"
 
-//Convert a stream into individual files -> ffmpeg -i 2000_tivoli.mp4 -f image2 -vframes 3000 -vcodec copy -bsf h264_mp4toannexb "%d.h264"
-//Run the above command in the media folder
-
 #define MTU 1456 //SRT-max
 #define WORKER_VIDEO_FRAMES 3000
 
-SRTNet mySRTNetClient;
-ElasticFrameProtocol myEFPSender(MTU,ElasticFrameMode::sender);
+SRTNet mySRTNetClient; //The SRT client
+ElasticFrameProtocol myEFPSender(MTU,ElasticFrameMode::sender); //EFP sender
 
+//This will act as our encoder and just provide us with a H264 AnnexB frame when we want one.
 std::vector<uint8_t> getNALUnit(int i) {
     std::string fileName="../media/" + std::to_string(i) + ".h264";
-
     FILE *f = fopen(fileName.c_str(), "rb");
     if (!f) {
         std::cout << "Failed opening file" << std::endl;
@@ -32,14 +29,17 @@ std::vector<uint8_t> getNALUnit(int i) {
     return my_vector;
 }
 
+//Just for debug
 int packSize;
 
 void sendData(const std::vector<uint8_t> &subPacket) {
 
-    if (subPacket[0] == 1) {
+    //for debugging actual bytes sent (payload bytes)
+    if (subPacket[0] == 1 || subPacket[0] == 3) {
         packSize += subPacket.size()-myEFPSender.geType1Size();
     }
 
+  //for debugging actual bytes sent (payload bytes)
     if (subPacket[0] == 2) {
         packSize += subPacket.size()-myEFPSender.geType2Size();
         std::cout << "Sent-> " << packSize << std::endl;
@@ -47,9 +47,10 @@ void sendData(const std::vector<uint8_t> &subPacket) {
     }
 
     SRT_MSGCTRL thisMSGCTRL1 = srt_msgctrl_default;
-    bool isBroken=mySRTNetClient.sendData((uint8_t*)subPacket.data(),subPacket.size(), &thisMSGCTRL1);
-    if (!isBroken) {
-        std::cout << "Should do something" << std::endl;
+    bool result=mySRTNetClient.sendData((uint8_t*)subPacket.data(),subPacket.size(), &thisMSGCTRL1);
+    if (!result) {
+        std::cout << "Failed sending. Deal with that." << std::endl;
+        //mySRTNetClient.stop(); ?? then reconnect?? try again for x times?? Notify the user?? Use a alternative socket??
     }
 }
 
@@ -71,11 +72,14 @@ int main() {
         return EXIT_FAILURE;
     }
 
+    //Generate some data to send
     uint64_t pts=0;
     for (int i = 0; i < WORKER_VIDEO_FRAMES ; ++i) {
         std::vector<uint8_t> thisNalData = getNALUnit(i+1);
         std::cout << "SendNAL > " << thisNalData.size() << " pts " << pts << std::endl;
         myEFPSender.packAndSend(thisNalData,ElasticFrameContent::h264,pts,'ANXB',1,NO_FLAGS);
+        //you could also send other data from other threads for example audio when the audio encoder spits out something.
+        //myEFPSender.packAndSend(thisADTSData,ElasticFrameContent::adts,pts,'ADTS',1,NO_FLAGS);
         pts += 90000/60; //fake a pts of 60Hz. FYI.. the codestream is 23.98 (I and P only)
         usleep(1000*16); //sleep for 16ms ~60Hz
     }
