@@ -27,8 +27,8 @@ public:
   ElasticFrameProtocol myEFPReceiver;
 };
 
-// Array of 256 possible EFP receivers, could be millions but I just decided 256 change to your needs. 
-// You could make it much simpler just giving a new connection a uint64_t number++  
+// Array of 256 possible EFP receivers, could be millions but I just decided 256 change to your needs.
+// You could make it much simpler just giving a new connection a uint64_t number++
 std::atomic_bool efpActiveList[UINT8_MAX] = {false};
 uint8_t getEFPId() {
   for (int i = 1; i < UINT8_MAX - 1; i++) {
@@ -55,7 +55,7 @@ std::shared_ptr<NetworkConnection> validateConnection(struct sockaddr_in *sin) {
   }
 
   // Here we can put whatever into the connection. The object we embed is maintained by SRTNet
-  // In this case we put MyClass in containing the EFP ID we got from getEFPId()
+  // In this case we put MyClass in containing the EFP ID we got from getEFPId() and a EFP-receiver
   auto a1 = std::make_shared<NetworkConnection>(); // Create a connection
   a1->object = std::make_shared<MyClass>(); // And my object containing my stuff
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(a1->object); //Then get a pointer to my stuff
