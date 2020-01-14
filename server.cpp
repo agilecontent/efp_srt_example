@@ -60,8 +60,10 @@ std::shared_ptr<NetworkConnection> validateConnection(struct sockaddr_in *sin) {
   a1->object = std::make_shared<MyClass>(); // And my object containing my stuff
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(a1->object); //Then get a pointer to my stuff
   v->efpId = efpId; // Populate it with the efpId
-  v->efpActiveElement = &efpActiveList[efpId]; // And a pointer to the list so that we invalidate the id when SRT drops the connection
-  v->myEFPReceiver.receiveCallback = std::bind(&gotData, std::placeholders::_1); //In this example we aggregate all callbacks..
+  v->efpActiveElement =
+      &efpActiveList[efpId]; // And a pointer to the list so that we invalidate the id when SRT drops the connection
+  v->myEFPReceiver.receiveCallback =
+      std::bind(&gotData, std::placeholders::_1); //In this example we aggregate all callbacks..
   v->myEFPReceiver.startReceiver(10, 2);
   return a1; // Now hand over the ownership to SRTNet
 }
@@ -73,7 +75,8 @@ bool handleData(std::unique_ptr<std::vector<uint8_t>> &content,
                 SRTSOCKET clientHandle) {
   //We got data from SRTNet
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(ctx->object); //Get my object I gave SRTNet
-  v->myEFPReceiver.receiveFragment(*content, v->efpId); //unpack the fragment I got using the efpId created at connection time.
+  v->myEFPReceiver.receiveFragment(*content,
+                                   v->efpId); //unpack the fragment I got using the efpId created at connection time.
   return true;
 }
 
