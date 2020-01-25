@@ -76,3 +76,9 @@ fabric.properties
 # Build directories
 /cmake-build-debug/
 /cmake-build-release/
+
+#srt
+/srtwrap
+
+#efp
+/efp

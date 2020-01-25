@@ -1,6 +1,6 @@
 #include <iostream>
 #include "efp/ElasticFrameProtocol.h"
-#include "srt/SRTNet.h"
+#include "srtwrap/SRTNet.h"
 
 #define MTU 1456 //SRT-max
 #define WORKER_VIDEO_FRAMES 3000
