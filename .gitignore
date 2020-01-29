@@ -77,8 +77,10 @@ fabric.properties
 /cmake-build-debug/
 /cmake-build-release/
 
-#srt
-/srtwrap
+#srt folder
+srtwrap/*
+!srtwrap/.gitkeep 
 
-#efp
-/efp
+#efp folder
+efp/*
+!efp/.gitkeep 
