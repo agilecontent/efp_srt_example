@@ -10,6 +10,7 @@ ExternalProject_Add(project_efp
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
         BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
         GIT_PROGRESS 1
+        BUILD_COMMAND make efp
         STEP_TARGETS build
         EXCLUDE_FROM_ALL TRUE
         INSTALL_COMMAND ""
@@ -19,10 +20,10 @@ set_property(TARGET efp PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/e
 
 ExternalProject_Add(project_cppsrtwrapp
         GIT_REPOSITORY https://github.com/andersc/cppSRTWrapper.git
-        GIT_SUBMODULES ""
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap
         BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap
         GIT_PROGRESS 1
+        BUILD_COMMAND make srtnet
         STEP_TARGETS build
         EXCLUDE_FROM_ALL TRUE
         INSTALL_COMMAND ""
@@ -36,11 +37,12 @@ find_package(OpenSSL REQUIRED)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/)
 
 add_executable(cppSRTFramingClient client.cpp)
-target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
 add_dependencies(cppSRTFramingClient project_efp)
 add_dependencies(cppSRTFramingClient project_cppsrtwrapp)
+target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
 
 add_executable(cppSRTFramingServer server.cpp)
-target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
 add_dependencies(cppSRTFramingClient project_efp)
 add_dependencies(cppSRTFramingClient project_cppsrtwrapp)
+target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
+

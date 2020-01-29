@@ -6,42 +6,12 @@ This example uses EFP ([ElasticFramingProtocol](https://bitbucket.org/unitxtra/e
 
 a SRT C++ wrapper used by this example. The wrapper is located [here](https://github.com/andersc/cppSRTWrapper).
 
-## Installation
-
-The libraries can be built and embedded into this project but for your convenience the libraries are pre-built for MacOS and Linux (release builds, debug logging turned on).
-
-The libraries and header files needed ->
-
-```
-/srt/
-	libsrt.a		//The SRT library
-	/srtcore/ 		//The SRT header files
-	version.h		//The SRT header file
-	libsrtnet.a		//The SRT C++ Wrapper
-	SRTNet.h		//The SRT C++ Wrapper header
-```
-	
-```
-/efp/
-	libefp.a					//ElasticFrameProtocol library
-	ElasticFrameProtocol.h 		//ElasticFrameProtocol header file
-```	
+## build
 
 
-**MacOS:**
+**All architectures:**
 
 ```
-./modeMacOS.sh
-cmake .
-make
-mkdir tmp
-mv cppSRTFramingClient tmp/
-```
-
-**Linux:**
-
-```
-./modeLinux.sh
 cmake .
 make
 mkdir tmp
