@@ -38,13 +38,12 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/efp/)
 
+add_dependencies(efp project_efp)
+add_dependencies(srtnet project_cppsrtwrapp)
+
 add_executable(cppSRTFramingClient client.cpp)
-add_dependencies(cppSRTFramingClient project_efp)
-add_dependencies(cppSRTFramingClient project_cppsrtwrapp)
 target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
 
 add_executable(cppSRTFramingServer server.cpp)
-add_dependencies(cppSRTFramingClient project_efp)
-add_dependencies(cppSRTFramingClient project_cppsrtwrapp)
 target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
 
