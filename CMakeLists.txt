@@ -35,6 +35,8 @@ find_package (Threads REQUIRED)
 find_package(OpenSSL REQUIRED)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/efp/)
 
 add_executable(cppSRTFramingClient client.cpp)
 add_dependencies(cppSRTFramingClient project_efp)
