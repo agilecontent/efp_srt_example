@@ -1,11 +1,15 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.10)
 project(cppSRTFramingExample)
 
 set(CMAKE_CXX_STANDARD 17)
 
+variable_watch(CMAKE_BUILD_TYPE)
+
 #If no build type is set then force Release
 IF( NOT CMAKE_BUILD_TYPE )
-    SET( CMAKE_BUILD_TYPE Release ... FORCE )
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING
+            "Choose the type of build, options are: None Debug Release RelWithDebInfo MinSizeRel."
+            FORCE)
 ENDIF()
 
 #Include EFP
