@@ -10,7 +10,7 @@ ExternalProject_Add(project_efp
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
         BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
         GIT_PROGRESS 1
-        BUILD_COMMAND make efp
+        BUILD_COMMAND cmake --build ${CMAKE_CURRENT_SOURCE_DIR}/efp --config Release --target efp
         STEP_TARGETS build
         EXCLUDE_FROM_ALL TRUE
         INSTALL_COMMAND ""
@@ -23,7 +23,7 @@ ExternalProject_Add(project_cppsrtwrapp
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap
         BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap
         GIT_PROGRESS 1
-        BUILD_COMMAND make srtnet
+        BUILD_COMMAND cmake --build ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap --config Release --target srtnet
         STEP_TARGETS build
         EXCLUDE_FROM_ALL TRUE
         INSTALL_COMMAND ""
