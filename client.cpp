@@ -6,7 +6,7 @@
 #define WORKER_VIDEO_FRAMES 3000
 
 SRTNet mySRTNetClient; //The SRT client
-ElasticFrameProtocol myEFPSender(MTU, ElasticFrameMode::sender); //EFP sender
+ElasticFrameProtocolSender myEFPSender(MTU); //EFP sender
 
 //This will act as our encoder and just provide us with a H264 AnnexB frame when we want one.
 std::vector<uint8_t> getNALUnit(int i) {

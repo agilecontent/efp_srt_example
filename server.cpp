@@ -6,7 +6,7 @@
 
 SRTNet mySRTNetServer; //SRT
 
-void gotData(ElasticFrameProtocol::pFramePtr &rPacket);
+void gotData(ElasticFrameProtocolReceiver::pFramePtr &rPacket);
 
 //**********************************
 //Server part
@@ -18,13 +18,16 @@ void gotData(ElasticFrameProtocol::pFramePtr &rPacket);
 
 class MyClass {
 public:
+  MyClass() {
+    myEFPReceiver = new (std::nothrow) ElasticFrameProtocolReceiver(5, 2);
+  }
   virtual ~MyClass() {
     *efpActiveElement = false; //Release active marker
-    myEFPReceiver.stopReceiver();
+    delete myEFPReceiver;
   };
   uint8_t efpId = 0;
   std::atomic_bool *efpActiveElement;
-  ElasticFrameProtocol myEFPReceiver;
+  ElasticFrameProtocolReceiver *myEFPReceiver;
 };
 
 // Array of 256 possible EFP receivers, could be millions but I just decided 256 change to your needs.
@@ -62,9 +65,8 @@ std::shared_ptr<NetworkConnection> validateConnection(struct sockaddr_in *sin) {
   v->efpId = efpId; // Populate it with the efpId
   v->efpActiveElement =
       &efpActiveList[efpId]; // And a pointer to the list so that we invalidate the id when SRT drops the connection
-  v->myEFPReceiver.receiveCallback =
+  v->myEFPReceiver->receiveCallback =
       std::bind(&gotData, std::placeholders::_1); //In this example we aggregate all callbacks..
-  v->myEFPReceiver.startReceiver(10, 2);
   return a1; // Now hand over the ownership to SRTNet
 }
 
@@ -75,7 +77,7 @@ bool handleData(std::unique_ptr<std::vector<uint8_t>> &content,
                 SRTSOCKET clientHandle) {
   //We got data from SRTNet
   auto v = std::any_cast<std::shared_ptr<MyClass> &>(ctx->object); //Get my object I gave SRTNet
-  v->myEFPReceiver.receiveFragment(*content,
+  v->myEFPReceiver->receiveFragment(*content,
                                    v->efpId); //unpack the fragment I got using the efpId created at connection time.
   return true;
 }
@@ -83,7 +85,7 @@ bool handleData(std::unique_ptr<std::vector<uint8_t>> &content,
 //ElasticFrameProtocol got som data from some efpSource.. Everything you need to know is in the rPacket
 //meaning EFP stream number EFP id and content type. if it's broken the PTS value
 //code with additional information of payload variant and if there is embedded data to extract and so on.
-void gotData(ElasticFrameProtocol::pFramePtr &rPacket) {
+void gotData(ElasticFrameProtocolReceiver::pFramePtr &rPacket) {
   std::cout << "BAM... Got some NAL-units of size " << unsigned(rPacket->mFrameSize) <<
             " pts " << unsigned(rPacket->mPts) <<
             " is broken? " << rPacket->mBroken <<
