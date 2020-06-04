@@ -79,7 +79,7 @@ int main() {
 
   //Set-up SRT
   auto client1Connection = std::make_shared<NetworkConnection>();
-  mySRTNetClient.recievedData = std::bind(&handleDataClient,
+  mySRTNetClient.receivedData = std::bind(&handleDataClient,
                                           std::placeholders::_1,
                                           std::placeholders::_2,
                                           std::placeholders::_3,
