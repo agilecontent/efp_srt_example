@@ -20,9 +20,8 @@ std::vector<uint8_t> getNALUnit(int i) {
   fseek(f, 0, SEEK_END);
   size_t fSize = ftell(f);
   fseek(f, 0, SEEK_SET);
-  uint8_t *pictureBuffer;
-  int result = posix_memalign((void **) &pictureBuffer, 32, fSize);
-  if (result) {
+  uint8_t *pictureBuffer = (uint8_t *)malloc(fSize);
+  if (!pictureBuffer) {
     std::cout << "Failed reserving memory" << std::endl;
     std::vector<uint8_t> empty;
     return empty;
