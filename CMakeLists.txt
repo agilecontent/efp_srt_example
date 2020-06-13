@@ -26,7 +26,11 @@ ExternalProject_Add(project_efp
         INSTALL_COMMAND ""
         )
 add_library(efp STATIC IMPORTED)
-set_property(TARGET efp PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/efp/libefp.a)
+IF (WIN32)
+    set_property(TARGET efp PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/efp/${CMAKE_BUILD_TYPE}/efp.lib)
+ELSE()
+    set_property(TARGET efp PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/efp/libefp.a)
+ENDIF()
 add_dependencies(efp project_efp)
 
 #Include cppSRTWrapper
@@ -56,6 +60,7 @@ find_package(OpenSSL REQUIRED)
 
 #Pass information about where to find headers
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/common)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/efp/)
 
