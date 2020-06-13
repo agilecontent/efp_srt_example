@@ -41,7 +41,13 @@ ExternalProject_Add(project_cppsrtwrapp
         INSTALL_COMMAND ""
         )
 add_library(srtnet STATIC IMPORTED)
-set_property(TARGET srtnet PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/libsrtnet.a)
+
+IF (WIN32)
+    set_property(TARGET srtnet PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/${CMAKE_BUILD_TYPE}/srtnet.lib)
+ELSE()
+    set_property(TARGET srtnet PROPERTY IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/libsrtnet.a)
+ENDIF()
+
 add_dependencies(srtnet project_cppsrtwrapp)
 
 #Find all required dependencies
@@ -55,9 +61,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/efp/)
 
 #Build the client
 add_executable(cppSRTFramingClient client.cpp)
-target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
+IF (WIN32)
+    target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/${CMAKE_BUILD_TYPE}/srt_static.lib ${OPENSSL_LIBRARIES} Threads::Threads)
+ELSE()
+    target_link_libraries(cppSRTFramingClient efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
+ENDIF()
 
 #Build the server
 add_executable(cppSRTFramingServer server.cpp)
-target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
+IF (WIN32)
+    target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/${CMAKE_BUILD_TYPE}/srt_static.lib ${OPENSSL_LIBRARIES} Threads::Threads)
+ELSE()
+    target_link_libraries(cppSRTFramingServer efp srtnet ${CMAKE_CURRENT_SOURCE_DIR}/srtwrap/srt/libsrt.a ${OPENSSL_LIBRARIES} Threads::Threads)
+ENDIF()
 
