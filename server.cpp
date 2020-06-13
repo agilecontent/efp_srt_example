@@ -130,7 +130,7 @@ int main() {
 
   //Run this server until ........
   while (true) {
-    sleep(1);
+      std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   //When you decide to quit garbage collect and stop threads....

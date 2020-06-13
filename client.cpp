@@ -107,7 +107,7 @@ int main() {
     //you could also send other data from other threads for example audio when the audio encoder spits out something.
     //myEFPSender.packAndSend(thisADTSData,ElasticFrameContent::adts,pts,'ADTS',1,NO_FLAGS);
     pts += 90000 / 60; //fake a pts of 60Hz. FYI.. the codestream is 23.98 (I and P only)
-    usleep(1000 * 16); //sleep for 16ms ~60Hz
+    std::this_thread::sleep_for(std::chrono::milliseconds(16)); //sleep for 16ms ~60Hz
   }
   mySRTNetClient.stop();
   std::cout << "Done sending will exit" << std::endl;
