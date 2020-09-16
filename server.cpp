@@ -81,8 +81,8 @@ std::shared_ptr<NetworkConnection> validateConnection(struct sockaddr &sin) {
   // Here we can put whatever into the connection. The object we embed is maintained by SRTNet
   // In this case we put MyClass in containing the EFP ID we got from getEFPId() and a EFP-receiver
   auto a1 = std::make_shared<NetworkConnection>(); // Create a connection
-  a1->object = std::make_shared<MyClass>(); // And my object containing my stuff
-  auto v = std::any_cast<std::shared_ptr<MyClass> &>(a1->object); //Then get a pointer to my stuff
+  a1->mObject = std::make_shared<MyClass>(); // And my object containing my stuff
+  auto v = std::any_cast<std::shared_ptr<MyClass> &>(a1->mObject); //Then get a pointer to my stuff
   v->efpId = efpId; // Populate it with the efpId
   v->efpActiveElement =
       &efpActiveList[efpId]; // And a pointer to the list so that we invalidate the id when SRT drops the connection
@@ -97,7 +97,7 @@ bool handleData(std::unique_ptr<std::vector<uint8_t>> &content,
                 std::shared_ptr<NetworkConnection> ctx,
                 SRTSOCKET clientHandle) {
   //We got data from SRTNet
-  auto v = std::any_cast<std::shared_ptr<MyClass> &>(ctx->object); //Get my object I gave SRTNet
+  auto v = std::any_cast<std::shared_ptr<MyClass> &>(ctx->mObject); //Get my object I gave SRTNet
   v->myEFPReceiver->receiveFragment(*content,
                                    v->efpId); //unpack the fragment I got using the efpId created at connection time.
   return true;
