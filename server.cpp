@@ -19,7 +19,7 @@ void gotData(ElasticFrameProtocolReceiver::pFramePtr &rPacket);
 class MyClass {
 public:
   MyClass() {
-    myEFPReceiver = new (std::nothrow) ElasticFrameProtocolReceiver(5, 2);
+    myEFPReceiver = new (std::nothrow) ElasticFrameProtocolReceiver(50, 20);
   }
   virtual ~MyClass() {
     *efpActiveElement = false; //Release active marker
