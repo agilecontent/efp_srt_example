@@ -15,7 +15,7 @@ ENDIF()
 #Include EFP
 include(ExternalProject)
 ExternalProject_Add(project_efp
-        GIT_REPOSITORY https://github.com/Unit-X/efp.git
+        GIT_REPOSITORY https://github.com/agilecontent/efp.git
         GIT_SUBMODULES ""
         SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
         BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/efp
